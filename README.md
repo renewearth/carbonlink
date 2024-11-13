@@ -10,6 +10,12 @@ TypeScript definitions for emission calculation and reporting.
 
 ## Installation
 
+# Set up npm registry
+
+```bash
+echo "registry=https://verdaccio.carbonlink.site/" > .npmrc
+```
+
 ```bash
 # Install types package
 npm install @carbonlink/types
