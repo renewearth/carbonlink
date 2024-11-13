@@ -37,3 +37,15 @@ npm run build
 # Publish
 npm publish
 ```
+
+---
+
+## Shared: package.json의 version 수정
+
+```bash
+npm version patch # 패치 버전 업데이트 (0.0.x)
+npm version minor # 마이너 버전 업데이트 (0.x.0)
+npm version major # 메이저 버전 업데이트 (x.0.0)
+
+npm publish
+```

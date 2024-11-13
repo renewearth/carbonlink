@@ -1,0 +1,84 @@
+{
+  "name": "@carbonlink/ui",
+  "version": "1.0.28",
+  "description": "Custom UI components for Carbonlink",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./components/charts/bar": {
+      "types": "./dist/components/charts/bar/index.d.ts",
+      "import": "./dist/components/charts/bar/index.mjs",
+      "require": "./dist/components/charts/bar/index.js"
+    },
+    "./components/charts/donut": {
+      "types": "./dist/components/charts/donut/index.d.ts",
+      "import": "./dist/components/charts/donut/index.mjs",
+      "require": "./dist/components/charts/donut/index.js"
+    },
+    "./components/charts/options": {
+      "types": "./dist/components/charts/options/index.d.ts",
+      "import": "./dist/components/charts/options/index.mjs",
+      "require": "./dist/components/charts/options/index.js"
+    },
+    "./components/charts/common/types": {
+      "types": "./dist/components/charts/common/types/index.d.ts",
+      "import": "./dist/components/charts/common/types/index.mjs",
+      "require": "./dist/components/charts/common/types/index.js"
+    },
+    "./components/table": {
+      "types": "./dist/components/table/index.d.ts",
+      "import": "./dist/components/table/index.mjs",
+      "require": "./dist/components/table/index.js"
+    },
+    "./types/common": {
+      "types": "./dist/types/common.d.ts",
+      "import": "./dist/types/common.mjs",
+      "require": "./dist/types/common.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsup --config tsup.config.ts",
+    "prebuild": "npm run clean",
+    "dev": "tsup --config tsup.config.ts --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "registry": "https://verdaccio.carbonlink.site/"
+  },
+  "keywords": [
+    "carbonlink",
+    "ui",
+    "components"
+  ],
+  "author": "Waylake",
+  "license": "ISC",
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.1.6",
+    "@types/node": "^22.9.0",
+    "@types/recharts": "^1.8.29",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.6",
+    "react-chartjs-2": "^5.2.0"
+  }
+}
