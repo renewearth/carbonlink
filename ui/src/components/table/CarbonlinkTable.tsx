@@ -1,182 +1,109 @@
 import {
-  TableContainer,
   Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
   Paper,
-  useTheme,
+  styled,
 } from "@mui/material";
-import { CarbonlinkTableProps } from "./types";
+import { ReactNode } from "react";
 
-export const CarbonlinkTable = <T extends { [key: string]: any }>({
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  fontWeight: "bold",
+  borderBottom: `2px solid ${theme.palette.divider}`,
+  whiteSpace: "nowrap",
+}));
+
+export interface ColumnConfig<T> {
+  key: keyof T;
+  label: string;
+  unit?: string;
+  formatter?: (value: T[keyof T], row: T) => ReactNode;
+  align?: "left" | "right" | "center";
+  width?: string | number;
+}
+
+export interface CarbonlinkTableProps<T extends Record<string, any>> {
+  data: T[];
+  columns: ColumnConfig<T>[];
+  getRowKey?: (row: T) => string | number;
+  formatNumber?: (value: number | undefined) => string;
+  stickyHeader?: boolean;
+  size?: "small" | "medium";
+  maxHeight?: number | string;
+}
+
+export default function CarbonlinkTable<T extends Record<string, any>>({
   data,
   columns,
-  rowKey,
-  transpose = false,
-  onRowClick,
-}: CarbonlinkTableProps<T>) => {
-  const theme = useTheme();
-
-  const renderRegularTable = () => (
-    <Table size="small">
-      <TableHead>
-        <TableRow sx={{ backgroundColor: theme.palette.grey[200] }}>
-          {columns.map((col) => (
-            <TableCell
-              key={String(col.key)}
-              sx={{
-                fontWeight: "bold",
-                whiteSpace: "nowrap",
-                padding: "12px 16px",
-              }}
-            >
-              {col.label}
-            </TableCell>
-          ))}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {data.map((item) => (
-          <TableRow
-            key={String(item[rowKey])}
-            hover
-            sx={{
-              cursor: onRowClick ? "pointer" : "default",
-              "&:nth-of-type(odd)": {
-                backgroundColor: theme.palette.action.hover,
-              },
-            }}
-            onClick={() => onRowClick?.(item)}
-          >
-            {columns.map((col) => (
-              <TableCell
-                key={`${String(item[rowKey])}-${String(col.key)}`}
-                sx={{
-                  whiteSpace: "nowrap",
-                  padding: "8px 16px",
-                }}
-              >
-                {col.format ? col.format(item[col.key]) : item[col.key]}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-
-  const renderTransposedTable = () => {
-    const keys = [...new Set(data.map((item) => String(item[rowKey])))];
-
-    return (
-      <Table size="small">
-        <TableHead>
-          <TableRow sx={{ backgroundColor: theme.palette.grey[200] }}>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                padding: "12px 16px",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {columns[0].label}
-            </TableCell>
-            {keys.map((key) => (
-              <TableCell
-                key={key}
-                align="right"
-                sx={{
-                  fontWeight: "bold",
-                  padding: "12px 16px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {key}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {columns.slice(1).map((col) => (
-            <TableRow
-              key={String(col.key)}
-              hover
-              sx={{
-                cursor: onRowClick ? "pointer" : "default",
-                "&:nth-of-type(odd)": {
-                  backgroundColor: theme.palette.action.hover,
-                },
-              }}
-              onClick={() => {
-                const rowData = data.map((item) => ({
-                  key: item[rowKey],
-                  value: item[col.key],
-                }));
-                onRowClick?.(rowData as any);
-              }}
-            >
-              <TableCell
-                sx={{
-                  whiteSpace: "nowrap",
-                  padding: "8px 16px",
-                }}
-              >
-                {col.label}
-              </TableCell>
-              {keys.map((key) => {
-                const rowData = data.find(
-                  (item) => String(item[rowKey]) === key,
-                );
-                return (
-                  <TableCell
-                    key={`${String(col.key)}-${key}`}
-                    align="right"
-                    sx={{
-                      whiteSpace: "nowrap",
-                      padding: "8px 16px",
-                    }}
-                  >
-                    {rowData
-                      ? col.format
-                        ? col.format(rowData[col.key])
-                        : rowData[col.key]
-                      : "-"}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    );
+  getRowKey = (row: T) => JSON.stringify(row),
+  formatNumber = (value) => {
+    if (value === undefined || value === null) return "-";
+    return new Intl.NumberFormat("ko-KR").format(Number(value.toFixed(2)));
+  },
+  stickyHeader = false,
+  size = "small",
+  maxHeight,
+}: CarbonlinkTableProps<T>) {
+  const renderCellContent = (row: T, column: ColumnConfig<T>): ReactNode => {
+    const value = row[column.key];
+    if (column.formatter) {
+      return column.formatter(value, row); // 두 번째 인자로 row 전달
+    }
+    if (typeof value === "number") {
+      return formatNumber(value);
+    }
+    return value as ReactNode;
   };
 
   return (
     <TableContainer
       component={Paper}
       sx={{
-        mt: 2,
-        boxShadow: theme.shadows[1],
-        borderRadius: 1,
-        overflow: "auto",
-        "&::-webkit-scrollbar": {
-          height: 10,
-          width: 10,
-        },
-        "&::-webkit-scrollbar-track": {
-          backgroundColor: theme.palette.grey[100],
-        },
-        "&::-webkit-scrollbar-thumb": {
-          backgroundColor: theme.palette.grey[400],
-          borderRadius: 5,
+        maxHeight,
+        "& .MuiTableCell-root": {
+          padding: size === "small" ? "6px 16px" : "16px",
         },
       }}
     >
-      {transpose ? renderTransposedTable() : renderRegularTable()}
+      <Table stickyHeader={stickyHeader} size={size}>
+        <TableHead>
+          <TableRow sx={{ backgroundColor: "rgba(0, 0, 0, 0.04)" }}>
+            {columns.map((column) => (
+              <StyledTableCell
+                key={String(column.key)}
+                align={column.align || "left"}
+                sx={{ width: column.width }}
+              >
+                {column.unit
+                  ? `${column.label} (${column.unit})`
+                  : column.label}
+              </StyledTableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.map((row) => (
+            <TableRow
+              key={getRowKey(row)}
+              sx={{
+                "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.04)" },
+              }}
+            >
+              {columns.map((column) => (
+                <TableCell
+                  key={String(column.key)}
+                  align={column.align || "left"}
+                >
+                  {renderCellContent(row, column)}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </TableContainer>
   );
-};
-
-export default CarbonlinkTable;
+}

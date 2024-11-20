@@ -1,9 +1,9 @@
+import { ChartOptions } from "chart.js";
 import { BaseChartProps } from "../common/types/chart";
 
 export interface DonutDataItem {
-  key: string;
+  name: string;
   value: number;
-  label: string;
   color?: string;
 }
 
@@ -11,8 +11,6 @@ export interface CarbonlinkDonutChartProps extends BaseChartProps {
   data: DonutDataItem[];
   centerText?: string;
   showLegend?: boolean;
-  showLabels?: boolean;
+  customOptions?: Partial<ChartOptions<"doughnut">>;
   onSliceClick?: (item: DonutDataItem) => void;
-  innerRadius?: number;
-  outerRadius?: number;
 }

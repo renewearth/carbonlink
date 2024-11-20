@@ -1,2 +1,2 @@
-export * from "./CarbonlinkDonutChart";
+export { default as CarbonlinkDonutChart } from "./CarbonlinkDonutChart";
 export * from "./types";
